@@ -27,6 +27,7 @@
   },
   "type": "module",
   "scripts": {
+    "agents-check": "node scripts/check-agents-md.mjs",
     "build": "vite build --mode prod",
     "build:test": "vite build --mode test",
     "cleanup": "sa cleanup",
@@ -102,7 +103,8 @@
   },
   "engines": {
     "node": ">=20.19.0",
-    "pnpm": ">=10.5.0"
+    "pnpm": ">=11.0.0"
   },
+  "packageManager": "pnpm@11.26.0",
   "website": "https://admin.soybeanjs.cn"
 }

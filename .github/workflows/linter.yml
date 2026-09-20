@@ -8,9 +8,18 @@ on:
   pull_request:
     branches: [main]
 
+  # 第 ④ 层防腐：定期复核。腐烂恰恰发生在**文件没改**的时候——脚本被改名、目录被移走、
+  # 命令被换掉，而文档一个字都没动。放在这个 workflow 里而不是新建一个，是为了不重复那条命令。
+  schedule:
+    - cron: '0 9 * * 1' # 每周一 09:00 UTC
+  # 手动触发：验收时不必等一周
+  workflow_dispatch:
+
 jobs:
   lint:
     name: Lint All Code
+    # 定期复核只需要跑零依赖的约束文档检查，不必每周拉起 super-linter
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
 
     steps:
@@ -28,3 +37,15 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           FILTER_REGEX_EXCLUDE: (docs|.github)
           VALIDATE_MARKDOWN: false
+
+  agents-md:
+    name: Check Constraint Docs
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+
+      # 零依赖脚本：不需要 setup-node / pnpm install
+      - name: Check AGENTS.md constraints
+        run: node scripts/check-agents-md.mjs

@@ -10,5 +10,53 @@
     "unicorn/no-array-sort": "off",
     "unicorn/no-array-reverse": "off",
     "unicorn/require-module-specifiers": "off"
-  }
+  },
+  "overrides": [
+    {
+      "files": ["src/layouts/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "axios",
+                "message": "视图/布局层不直接发起 HTTP：请通过 @/service/api 的 fetchXxx 调用（边界见 docs/guides/architecture.md 的「模块边界」一节）。"
+              },
+              {
+                "name": "@sa/axios",
+                "message": "视图/布局层不直接发起 HTTP：请通过 @/service/api 的 fetchXxx 调用（边界见 docs/guides/architecture.md 的「模块边界」一节）。"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/views/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "axios",
+                "message": "视图/布局层不直接发起 HTTP：请通过 @/service/api 的 fetchXxx 调用（边界见 docs/guides/architecture.md 的「模块边界」一节）。"
+              },
+              {
+                "name": "@sa/axios",
+                "message": "视图/布局层不直接发起 HTTP：请通过 @/service/api 的 fetchXxx 调用（边界见 docs/guides/architecture.md 的「模块边界」一节）。"
+              }
+            ],
+            "patterns": [
+              {
+                "group": ["@/views", "@/views/*", "@/views/**"],
+                "message": "页面之间禁止互相引用：可复用逻辑请上提到 src/components 或 packages/（边界见 docs/guides/architecture.md 的「模块边界」一节）。"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
 }
