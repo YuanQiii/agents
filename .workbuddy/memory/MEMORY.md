@@ -88,10 +88,13 @@ refreshToken 死循环警告；只在「机器表达不了**且**违反后果严
 
 ## 已知欠账
 
-- `.github/CODEOWNERS` 未建——缺 owner 名（信息缺口，不是技术障碍）。
-- 防腐第 ⑤ 层（代理级验证 / proof loop）未做，理由见 `docs/anti-rot-plan.md`。
 - 依赖声明的欠账见上「依赖与 pnpm 版本」一节（属依赖变更，须先问）。
+- 防腐第 ⑤ 层（代理级验证 / proof loop）未做，理由见 `docs/anti-rot-plan.md`。
 - `docs/anti-rot-plan.md` 是**方案文档**，它的实施状态以文档开头那一行为准。
+- 远端：`origin` = `https://github.com/YuanQiii/agents.git`（**私有**）。本机无 SSH key，所以 fetch/push 都走 HTTPS + 凭据管理器；
+  加了 key 之后可改回 `git@github.com:YuanQiii/agents.git`。
+- **本工作区的 `.git` 有异常**（`git switch -c` 会建出「未出生分支」；`.git` 曾整个变空）——
+  处置与恢复流程见用户级 MEMORY，**不要在这个工作区建本地分支**，需要远程分支就用 GitHub API。
 
 ## 工具教训
 
