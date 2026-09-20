@@ -1,7 +1,12 @@
 # CODEOWNERS — 约束层面与门禁的归属
 #
-# 生效条件：仓库设置里开启 branch protection，并勾选「Require review from Code Owners」。
-# 未开启时本文件不产生实际约束——它只声明归属，不会自己拦下任何东西。
+# 生效条件：仓库设置里开启 branch protection（或 rulesets），并勾选「Require review from Code Owners」。
+#
+# ⚠️ **当前无法生效**（2026-09-20 实测）：本仓库是私有仓库，而 GitHub 的 branch protection 与 rulesets
+#    在私有仓库上都要求 GitHub Pro —— 两个接口分别返回
+#    403 "Upgrade to GitHub Pro or make this repository public to enable this feature."
+#    所以本文件目前是**声明性**的：它记下归属意图，等仓库转为公开或升级到 Pro 之后才真正拦人。
+#    **在此之前，不要以为改下面这些文件会被拦住。**
 #
 # 为什么这些文件值得单独指定 owner：它们会**静默**影响之后每一个 agent 与协作者的行为，
 # 而且改错了不会有任何报错。这正是 docs/anti-rot-plan.md 里说的「缺失型腐烂」的入口。
