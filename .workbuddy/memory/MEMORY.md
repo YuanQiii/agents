@@ -88,6 +88,9 @@ refreshToken 死循环警告；只在「机器表达不了**且**违反后果严
 
 ## 已知欠账
 
+- **`.github/CODEOWNERS` 已建，但当前无法生效**：本仓库是私有仓库，而 branch protection 与 rulesets 在私有仓库上
+  都要求 GitHub Pro（实测两个接口均返回 403 `Upgrade to GitHub Pro or make this repository public`）。
+  所以它目前只是**声明性**的——转公开或升级 Pro 后才真正拦人。文件头已如实写明这一点。
 - 依赖声明的欠账见上「依赖与 pnpm 版本」一节（属依赖变更，须先问）。
 - 防腐第 ⑤ 层（代理级验证 / proof loop）未做，理由见 `docs/anti-rot-plan.md`。
 - `docs/anti-rot-plan.md` 是**方案文档**，它的实施状态以文档开头那一行为准。
