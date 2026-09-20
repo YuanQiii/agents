@@ -59,3 +59,5 @@ CI（`.github/workflows/linter.yml`）在 **PR 与 push 到 `main`** 时跑 `nod
 还有一条 PR 级漂移提醒：`package.json` / lock / `pnpm-workspace.yaml` / `tsconfig*.json` / `*.config.*` / `.env*` 变了、而这个 PR 没改任何 `AGENTS.md` 时，会在 PR 上留言提示回来复核（**只提醒，不阻断**）。
 
 交付时按 [`docs/guides/workflow-validation.md`](docs/guides/workflow-validation.md) 的格式给出 Validation 报告：每个 FAIL 带归因（代码 / 环境 / 配置），仓库没有的命令写 `NOT AVAILABLE`（`test` 恒为 `NOT AVAILABLE`），未验证的部分显式声明。
+
+<!-- drift-verify probe: 本行仅用于验证漂移检测的自动清理路径，随分支删除 -->
