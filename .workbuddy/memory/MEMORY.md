@@ -90,8 +90,16 @@ refreshToken 死循环警告；只在「机器表达不了**且**违反后果严
 - **依赖声明欠账 2 处**（`@sa/uno-preset` 缺 `@unocss/core` + `@unocss/preset-mini`；根 `src/service/request/index.ts` 缺 `axios`）
   ——**用户 2026-09-20 明确指示先不用管**。
 - 防腐第 ⑤ 层（代理级验证）未做，理由见 `docs/anti-rot-plan.md`。
-- `docs/anti-rot-plan.md` 是**方案文档**，实施状态以文档开头那一行为准。
-- 远端 `origin`（`YuanQiii/agents`）的可见性与分支保护状态见用户级 MEMORY 或直接查 API。
+
+## 远端与分支保护
+
+- `origin` = `https://github.com/YuanQiii/agents.git`，**公开仓库**（2026-09-20 由私有转公开）。
+- `main` **已开启分支保护**：要求 PR + 1 个 code owner 审批、禁 force push 与删除分支；**`enforce_admins: false`（管理员可直推）**。
+  配置在 GitHub 仓库设置里，仓库内查不到当前值——核对：`GET /repos/{owner}/{repo}/branches/main/protection`。
+  **转公开的原因**：私有仓库上 branch protection 与 rulesets 都要求 GitHub Pro（两个接口原本都返回 403）。
+- `.github/CODEOWNERS` 覆盖约束文档与门禁配置。它是防腐**第 ① 层的人工过目**机制，**不替代 Gate**——
+  见 `docs/anti-rot-plan.md` 第 ① 层与 `docs/guides/workflow-validation.md` 的「分支保护」。
+- 本机无 SSH key，push 走 HTTPS + 凭据管理器；GitHub 传输一律经代理 **7897**。
 
 ## 工具教训
 
