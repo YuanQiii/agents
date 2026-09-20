@@ -84,6 +84,18 @@ commit-msg : pnpm sa git-commit-verify
 
 **CI 不跑 typecheck、不跑 build、不跑测试。** 本地 Gate 是唯一防线，别指望 CI 兜。
 
+### 分支保护（仓库设置，不在仓库文件里）
+
+`main` 开启了分支保护，**配置存在 GitHub 仓库设置里**——仓库内查不到它的当前值，所以这里只记设置时的取值与核对方式，不声称「现在是 X」。核对：Settings → Branches，或 `GET /repos/{owner}/{repo}/branches/main/protection`（404 = 未开启）。
+
+2026-09-20 的设置：
+
+- **要求 PR + 1 个 code owner 审批**，`dismiss_stale_reviews` 开；禁止 force push 与删除分支
+- **`enforce_admins = false`** —— 管理员本人可以直接推 `main`。**这条拦的是协作者与自动化，不是维护者**
+- `.github/CODEOWNERS` 指定的 owner 覆盖：约束文档（`AGENTS.md` / `packages/AGENTS.md` / `CONTEXT.md` / `docs/`）与门禁配置（`.oxlintrc.json` / `.oxfmtrc.json` / `eslint.config.js` / `tsconfig.json` / `scripts/check-agents-md.mjs` / `.github/`）
+
+**它不替代 Gate**：既不拦管理员，也不检查内容质量——只保证改这些文件时会经过一次人工过目。
+
 ## 约束的三层
 
 按「违反后谁会发现」分，三层缺一不可：
