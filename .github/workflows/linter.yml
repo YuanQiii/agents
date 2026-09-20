@@ -8,6 +8,10 @@ on:
   pull_request:
     branches: [main]
 
+  # 推送到 main 也跑：否则 main 上的提交完全没有门禁兜底（原本只有 PR / 每周 / 手动三种触发）。
+  push:
+    branches: [main]
+
   # 第 ④ 层防腐：定期复核。腐烂恰恰发生在**文件没改**的时候——脚本被改名、目录被移走、
   # 命令被换掉，而文档一个字都没动。放在这个 workflow 里而不是新建一个，是为了不重复那条命令。
   schedule:

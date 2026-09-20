@@ -54,7 +54,7 @@ pnpm typecheck && pnpm lint && pnpm fmt && git diff --exit-code
 
 `pre-commit` 跑的就是这一串。因为 `lint` / `fmt` 会改文件，先跑完并 `git add` 再提交，否则最后一步 `git diff --exit-code` 会失败。
 
-CI（`.github/workflows/linter.yml`）另跑 `node scripts/check-agents-md.mjs`（等同 `pnpm agents-check`；用 `node` 直跑是为了 CI 不必先 `pnpm install`）——校验**约束文档本身**：相对链接是否可达、文档里提到的命令是否真实存在、有没有留下会腐烂的章节号指针。同一个 job 还每周一自动跑一次（`schedule`，也可在 Actions 页面手动触发）——**腐烂也会发生在文件一个字没改的时候**。
+CI（`.github/workflows/linter.yml`）在 **PR 与 push 到 `main`** 时跑 `node scripts/check-agents-md.mjs`（等同 `pnpm agents-check`；用 `node` 直跑是为了 CI 不必先 `pnpm install`）——校验**约束文档本身**：相对链接是否可达、文档里提到的命令是否真实存在、有没有留下会腐烂的章节号指针。同一个 job 还每周一自动跑一次（`schedule`，也可在 Actions 页面手动触发）——**腐烂也会发生在文件一个字没改的时候**。
 
 还有一条 PR 级漂移提醒：`package.json` / lock / `pnpm-workspace.yaml` / `tsconfig*.json` / `*.config.*` / `.env*` 变了、而这个 PR 没改任何 `AGENTS.md` 时，会在 PR 上留言提示回来复核（**只提醒，不阻断**）。
 
