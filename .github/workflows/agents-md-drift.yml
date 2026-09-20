@@ -1,0 +1,94 @@
+---
+name: Constraint Docs Drift
+
+# AGENTS.md 的失败模式很特殊：它过期时不会让任何东西坏掉，所以没人会发现。
+# 这个 workflow 治的是最阴的一类——「改了配置却没登记进文档」（缺失型腐烂）。
+# 它只提醒，不阻断合入。社区规则是：文档与代码同 PR 修改。
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  drift:
+    name: Check Constraint Docs Drift
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Detect drift
+        id: detect
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          CHANGED=$(git diff --name-only "$BASE_SHA" "$HEAD_SHA")
+
+          # 这些文件一变，约束文档里的命令 / 边界 / 工具链事实就可能失真
+          WATCHED='^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|eslint\.config\.js|\.oxlintrc\.json|\.oxfmtrc\.json|tsconfig\.json|vite\.config\.ts|uno\.config\.ts|\.env.*)$|^packages/[^/]+/(package\.json|tsconfig\.json)$'
+
+          HIT=$(echo "$CHANGED" | grep -E "$WATCHED" || true)
+          TOUCHED=$(echo "$CHANGED" | grep -E '(^|/)AGENTS\.md$' || true)
+
+          if [ -n "$HIT" ] && [ -z "$TOUCHED" ]; then
+            echo "drift=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "drift=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          {
+            echo '<!-- agents-md-drift -->'
+            echo '### 约束文档可能需要同步'
+            echo ''
+            echo '本 PR 改动了下列文件，但没有一起改任何 `AGENTS.md`：'
+            echo ''
+            echo '```'
+            echo "$HIT"
+            echo '```'
+            echo ''
+            echo '**请更新文档，或在本 PR 里说明为什么不需要改**：'
+            echo ''
+            echo '| 改了什么 | 回来复核 |'
+            echo '| --- | --- |'
+            echo '| `package.json` 的 scripts / 依赖、lock、`pnpm-workspace.yaml` | 根 `AGENTS.md` 的合入门禁、`docs/guides/workflow-validation.md` 的命令表 |'
+            echo '| `.oxlintrc.json`、`eslint.config.js`、`tsconfig*.json` | `docs/guides/conventions.md` 的覆盖范围与规则表（该表是抄来的值）、`docs/guides/types.md` |'
+            echo '| `.env*` | `docs/guides/types.md` 的同步表、`docs/guides/auth-security.md` |'
+            echo ''
+            echo '这只是提醒，**不阻断合入**。判定标准：文档与代码同 PR 修改。'
+            echo ''
+            echo '> 本评论由 workflow 维护：问题解决后会自动删除。'
+          } > drift-comment.md
+
+      - name: Comment or clean up
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.pull_request.number }}
+          DRIFT: ${{ steps.detect.outputs.drift }}
+        run: |
+          set -euo pipefail
+          REPO="${{ github.repository }}"
+          MARKER='<!-- agents-md-drift -->'
+
+          # 找出本 workflow 之前留下的评论（用 marker 识别）
+          EXISTING=$(gh api "repos/$REPO/issues/$PR/comments" \
+            --jq "[.[] | select(.body | contains(\"$MARKER\")) | .id] | .[0] // empty")
+
+          if [ "$DRIFT" = "true" ] && [ -z "$EXISTING" ]; then
+            gh pr comment "$PR" --body-file drift-comment.md
+            echo "已留言提醒"
+          elif [ "$DRIFT" = "false" ] && [ -n "$EXISTING" ]; then
+            gh api -X DELETE "repos/$REPO/issues/comments/$EXISTING"
+            echo "已同步文档，删除先前的提醒"
+          else
+            echo "无需动作（drift=$DRIFT, existing=${EXISTING:-none}）"
+          fi
